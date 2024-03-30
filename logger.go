@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"bytes"
+	"io"
 	"net/http"
 	"time"
 
@@ -14,7 +16,12 @@ func WithLogger() func(http.Handler) http.Handler {
 			ctx := r.Context()
 			start := time.Now()
 
-			ww := &ResponseWriter{ResponseWriter: w}
+			writer := &ResponseWriter{
+				ResponseWriter: w,
+				ResponseBody:   &bytes.Buffer{},
+			}
+			defer writer.Flush()
+
 			// prepare the logger
 			logger := slogr.FromContext(ctx)
 			logger = logger.With(slogr.Request(r))
@@ -25,13 +32,13 @@ func WithLogger() func(http.Handler) http.Handler {
 			r = r.WithContext(ctx)
 
 			// execute the handler
-			next.ServeHTTP(ww, r)
+			next.ServeHTTP(writer, r)
 
 			duration := time.Since(start)
 			// log the request end
-			logger = logger.With(slogr.ResponseWriter(ww, slogr.WithLatency(duration)))
+			logger = logger.With(slogr.ResponseWriter(writer, slogr.WithLatency(duration)))
 
-			status := ww.GetStatusCode()
+			status := writer.GetStatusCode()
 			switch {
 			case status < 400:
 				logger.InfoContext(ctx, "")
@@ -56,12 +63,15 @@ var (
 // ResponseWriter repersents a response writer.
 type ResponseWriter struct {
 	ResponseWriter http.ResponseWriter
+	ResponseBody   io.ReadWriter
 	StatusCode     int32
 	ContentLength  int64
 }
 
 // Flush implements http.Flusher.
 func (r *ResponseWriter) Flush() {
+	io.Copy(r.ResponseWriter, r.ResponseBody)
+
 	if flusher, ok := r.ResponseWriter.(http.Flusher); ok {
 		flusher.Flush()
 	}
@@ -74,7 +84,7 @@ func (r *ResponseWriter) Header() http.Header {
 
 // Write implements http.ResponseWriter
 func (r *ResponseWriter) Write(data []byte) (int, error) {
-	n, err := r.ResponseWriter.Write(data)
+	n, err := r.ResponseBody.Write(data)
 	r.ContentLength = r.ContentLength + int64(n)
 	return n, err
 }

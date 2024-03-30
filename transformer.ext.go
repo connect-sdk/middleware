@@ -391,7 +391,6 @@ func URLMessageType(uri *url.URL) (protoreflect.MessageType, error) {
 	path = path + "Request"
 	// convert the path to a full name
 	name := protoreflect.FullName(path)
-	fmt.Println(name)
 	// find the message by name
 	return protoregistry.GlobalTypes.FindMessageByName(name)
 }
