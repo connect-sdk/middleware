@@ -7,27 +7,31 @@ import (
 
 // GetRequestURL returns the request URL
 func GetRequestURL(r *http.Request) *url.URL {
-	addr := &url.URL{}
+	endpoint := &url.URL{}
 
 	if r.TLS == nil {
-		addr.Scheme = "http"
+		endpoint.Scheme = "http"
 	} else {
-		addr.Scheme = "https"
+		endpoint.Scheme = "https"
 	}
 
 	if r.Host == "" {
-		addr.Host = r.Header.Get("Host")
+		endpoint.Host = r.Header.Get("Host")
 	} else {
-		addr.Host = r.Host
+		endpoint.Host = r.Host
 	}
 
 	if value := r.Header.Get("X-Forwarded-Host"); value != "" {
-		addr.Host = value
+		endpoint.Host = value
 	}
 
 	if value := r.Header.Get("X-Forwarded-Proto"); value != "" {
-		addr.Scheme = value
+		endpoint.Scheme = value
 	}
 
-	return addr
+	if value := r.URL; value != nil {
+		endpoint.Path = value.Path
+	}
+
+	return endpoint
 }
