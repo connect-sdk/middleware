@@ -8,7 +8,7 @@ require (
 	github.com/go-chi/cors v1.2.1
 	github.com/ralch/slogr v0.0.0-20231103131639-6be682bdd645
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.58.0
-	google.golang.org/grpc v1.69.0
+	google.golang.org/grpc v1.69.2
 	google.golang.org/protobuf v1.36.0
 )
 
