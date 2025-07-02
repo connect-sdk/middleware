@@ -6,7 +6,7 @@ toolchain go1.24.1
 
 require (
 	github.com/connect-sdk/telemetry v0.0.0-20240226062722-42812fc9d577
-	github.com/go-chi/cors v1.2.1
+	github.com/go-chi/cors v1.2.2
 	github.com/ralch/slogr v0.0.0-20231103131639-6be682bdd645
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.62.0
 	google.golang.org/grpc v1.73.0
