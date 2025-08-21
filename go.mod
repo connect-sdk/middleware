@@ -10,7 +10,7 @@ require (
 	github.com/ralch/slogr v0.0.0-20231103131639-6be682bdd645
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.62.0
 	google.golang.org/grpc v1.75.0
-	google.golang.org/protobuf v1.36.7
+	google.golang.org/protobuf v1.36.8
 )
 
 require (
